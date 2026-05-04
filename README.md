@@ -54,29 +54,44 @@ truncation of the description based on `columns`. Badge is `O` (magenta, Opus),
 
 ## Install
 
-Requires Go 1.26+.
+### Pre-built binary (no Go required)
 
-### One-liner
+```bash
+curl -fsSL https://raw.githubusercontent.com/drecken/claude-statusline/main/install.sh | bash
+```
+
+Downloads the latest release for your platform (darwin/linux × amd64/arm64),
+verifies the checksum, installs both binaries to `$HOME/.claude/bin/`, and
+prints the `settings.json` snippet to add.
+
+Pin a version with `VERSION=v0.1.0` or change the install location with
+`INSTALL_DIR=/somewhere/else`.
+
+### Ask Claude Code to install it
+
+Paste this prompt into Claude Code:
+
+> Install https://github.com/drecken/claude-statusline — run `install.sh` from
+> the repo, then add the printed `statusLine` and `subagentStatusLine` keys to
+> my `~/.claude/settings.json`.
+
+Claude will run the installer and patch `settings.json` for you.
+
+### From source
+
+Requires Go 1.26+.
 
 ```bash
 go install github.com/drecken/claude-statusline/cmd/statusline@latest
 go install github.com/drecken/claude-statusline/cmd/subagent-statusline@latest
 ```
 
-Binaries land in `$(go env GOBIN)` (or `$(go env GOPATH)/bin`).
+Or clone and `make install` to put binaries in `$HOME/.claude/bin/`. Override
+with `make install INSTALL_DIR=/somewhere/else`.
 
-### From source
+### Wire it up
 
-```bash
-git clone https://github.com/drecken/claude-statusline
-cd claude-statusline
-make install
-```
-
-Installs both binaries to `$HOME/.claude/bin/`. Override with
-`make install INSTALL_DIR=/somewhere/else`.
-
-Then add to `~/.claude/settings.json`:
+Add to `~/.claude/settings.json`:
 
 ```json
 {
