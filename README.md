@@ -19,7 +19,7 @@ Three lines, cyan / yellow / green scheme, OSC 8 hyperlinks on the PR number:
 ```
 ~/Code/project
 main | +23/-5 | PR #142 APPROVED Fix edge case in retry logic
-ctx 42% | Opus 4.7 | effort:high | think
+ctx 42% | tkn 84K | Opus 4.7 | effort:high | think
 ```
 
 **Line 2 colors**
@@ -41,6 +41,7 @@ ctx 42% | Opus 4.7 | effort:high | think
 | Element   | Rule                                                    |
 | --------- | ------------------------------------------------------- |
 | Context % | green <70, yellow 70–84, red ≥85                        |
+| Tokens    | green <150K, yellow ≥150K, red ≥180K; omitted when no `current_usage` |
 | Model     | dim                                                     |
 | Effort    | cyan, omitted when `effort` absent                      |
 | Thinking  | magenta `think`, shown only when `thinking.enabled`     |
@@ -128,6 +129,7 @@ Main statusline:
 | `workspace.current_dir`          | Line 1                   |
 | `session_id`                     | Branch cache key         |
 | `context_window.used_percentage` | Line 3 (ctx %)           |
+| `context_window.current_usage.{input_tokens,cache_creation_input_tokens,cache_read_input_tokens}` | Line 3 (tkn NK), summed |
 | `model.display_name` / `model.id`| Line 3                   |
 | `effort.level`                   | Line 3 (conditional)     |
 | `thinking.enabled`               | Line 3 (conditional)     |

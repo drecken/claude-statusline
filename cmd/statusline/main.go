@@ -24,6 +24,11 @@ type input struct {
 	} `json:"model"`
 	ContextWindow struct {
 		UsedPercentage *float64 `json:"used_percentage"`
+		CurrentUsage   *struct {
+			InputTokens              int `json:"input_tokens"`
+			CacheCreationInputTokens int `json:"cache_creation_input_tokens"`
+			CacheReadInputTokens     int `json:"cache_read_input_tokens"`
+		} `json:"current_usage"`
 	} `json:"context_window"`
 	Effort *struct {
 		Level string `json:"level"`
@@ -148,7 +153,11 @@ func prColor(pr *gitreview.Data) string {
 }
 
 func renderLine3(in input) string {
-	parts := []string{renderContext(in), renderModel(in)}
+	parts := []string{renderContext(in)}
+	if tkn := renderTokens(in); tkn != "" {
+		parts = append(parts, tkn)
+	}
+	parts = append(parts, renderModel(in))
 	if in.Effort != nil && in.Effort.Level != "" {
 		parts = append(parts, color.Wrap(color.Cyan, "effort:"+in.Effort.Level))
 	}
@@ -171,6 +180,22 @@ func renderContext(in input) string {
 		c = color.Yellow
 	}
 	return color.Wrap(c, fmt.Sprintf("ctx %d%%", int(pct)))
+}
+
+func renderTokens(in input) string {
+	cu := in.ContextWindow.CurrentUsage
+	if cu == nil {
+		return ""
+	}
+	used := cu.InputTokens + cu.CacheCreationInputTokens + cu.CacheReadInputTokens
+	c := color.Green
+	switch {
+	case used >= 180000:
+		c = color.Red
+	case used >= 150000:
+		c = color.Yellow
+	}
+	return color.Wrap(c, fmt.Sprintf("tkn %dK", used/1000))
 }
 
 func renderModel(in input) string {
