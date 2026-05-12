@@ -36,10 +36,6 @@ type input struct {
 	Thinking *struct {
 		Enabled bool `json:"enabled"`
 	} `json:"thinking"`
-	Cost struct {
-		TotalLinesAdded   int `json:"total_lines_added"`
-		TotalLinesRemoved int `json:"total_lines_removed"`
-	} `json:"cost"`
 }
 
 func main() {
@@ -58,7 +54,7 @@ func main() {
 	}
 
 	fmt.Println(renderLine1(cwd))
-	fmt.Println(renderLine2(cwd, in.SessionID, in.Cost.TotalLinesAdded, in.Cost.TotalLinesRemoved))
+	fmt.Println(renderLine2(cwd, in.SessionID))
 	fmt.Println(renderLine3(in))
 }
 
@@ -71,13 +67,14 @@ func renderLine1(cwd string) string {
 	return color.Wrap(color.Cyan, display)
 }
 
-func renderLine2(cwd, sessionID string, added, removed int) string {
+func renderLine2(cwd, sessionID string) string {
 	branch := gitcache.Branch(cwd, sessionID)
 	if branch == "" {
 		return color.Wrap(color.Dim, "(no git)")
 	}
 
-	parts := []string{color.Wrap(color.BrightBlack, branch), renderChanges(added, removed)}
+	changes := gitcache.Diff(cwd, sessionID)
+	parts := []string{color.Wrap(color.BrightBlack, branch), renderChanges(changes.Added, changes.Removed)}
 
 	pr := gitreview.Fetch(cwd)
 	parts = append(parts, renderPR(pr))

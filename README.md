@@ -117,6 +117,8 @@ Add to `~/.claude/settings.json`:
   `gitlab*` use `glab`, self-hosted is probed via `auth status --hostname`.
 - **Git branch cache** — `$TMPDIR/claude-statusline-git-<session_id>`, TTL 5 s.
   Session-keyed so concurrent sessions in different repos don't collide.
+- **Git diff cache** — `$TMPDIR/claude-statusline-diff-<session_id>`, TTL 5 s.
+  Stores `+N/-N` from `git diff --shortstat HEAD`.
 
 Every subprocess call has a 5 s timeout.
 
@@ -133,7 +135,10 @@ Main statusline:
 | `model.display_name` / `model.id`| Line 3                   |
 | `effort.level`                   | Line 3 (conditional)     |
 | `thinking.enabled`               | Line 3 (conditional)     |
-| `cost.total_lines_added/removed` | Line 2                   |
+
+Line 2's `+N/-N` comes from `git diff --shortstat HEAD` (staged + unstaged vs
+HEAD), so it drops to `+0/-0` on commit instead of accumulating across the
+session.
 
 Subagent statusline: `columns` and `tasks[]` (`id, name, type, status, description, label, startTime, tokenCount, cwd`).
 
@@ -154,7 +159,7 @@ internal/
 ## Verify
 
 ```bash
-echo '{"workspace":{"current_dir":"'$PWD'"},"session_id":"test","model":{"display_name":"Opus 4.7"},"context_window":{"used_percentage":42},"cost":{"total_lines_added":23,"total_lines_removed":5},"effort":{"level":"high"},"thinking":{"enabled":true}}' \
+echo '{"workspace":{"current_dir":"'$PWD'"},"session_id":"test","model":{"display_name":"Opus 4.7"},"context_window":{"used_percentage":42},"effort":{"level":"high"},"thinking":{"enabled":true}}' \
   | ./bin/statusline
 ```
 
